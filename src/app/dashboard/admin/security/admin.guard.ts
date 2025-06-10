@@ -4,6 +4,7 @@ import { Router } from "@angular/router";
 import { map, Observable } from "rxjs";
 import { User } from "../../../account/models/user";
 import { jwtDecode } from "jwt-decode";
+import { NotificationService } from "../../../shared/service/notification.service";
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ import { jwtDecode } from "jwt-decode";
 export class AdminGuard {
 
   constructor(
-    private accountService: AccountService,
+    private accountService: AccountService, private notificationService: NotificationService,
     private router: Router
   ) { }
 
@@ -33,11 +34,10 @@ export class AdminGuard {
             return true;
           }
         }
-
+        this.notificationService.showNotification(false, 'Restricted Area', 'Leave now!');
         this.router.navigateByUrl('/');
         return false;
       })
     );
   }
-
 }

@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { ValidationMessagesComponent } from '../../shared/validation-messages/validation-messages.component';
 import { take } from 'rxjs';
 import { User } from '../models/user';
+import { ToastService } from '../../shared/service/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -32,7 +33,7 @@ import { User } from '../models/user';
               type="text"
               class="form-control"
               id="floatingInput"
-placeholder="Username (your email address)"  [class.is-invalid]="submitted && loginForm.get('userName')?.errors">
+              placeholder="Username (your email address)"  [class.is-invalid]="submitted && loginForm.get('userName')?.errors">
             <label for="floatingInput">Email address</label>
             <span class="text-danger" *ngIf="submitted && loginForm.get('userName')?.hasError('required')">
                         Username is required
@@ -76,10 +77,12 @@ export class LoginComponent  implements OnInit  {
   submitted = false;
   errorMessages: string[] = [];
 
-  constructor(private accountService: AccountService, private formBuilder: FormBuilder, private router: Router) {
+  constructor(private accountService: AccountService, private formBuilder: FormBuilder, private router: Router, private toastService:ToastService) {
       this.accountService.user$.pipe(take(1)).subscribe({
         next: (user:User | null) => {
-          this.router.navigateByUrl('/dashboard')
+          if(user){
+            this.router.navigateByUrl('/dashboard')
+          }
         }
       })
     }
@@ -96,22 +99,30 @@ export class LoginComponent  implements OnInit  {
   }
 
   login() {
-    this.submitted = true;
-    this.errorMessages = [];
+  this.submitted = true;
+  this.errorMessages = [];
 
-    if (this.loginForm.valid) {
-      this.accountService.login(this.loginForm.value).subscribe({
-        next: _ => {
-          this.router.navigateByUrl('/dashboard');
-        },
-        error: error => {
-          if (error.error.errors) {
-            this.errorMessages = error.error.errors;
-          } else {
-            this.errorMessages.push(error.error);
-          }
+  if (this.loginForm.valid) {
+    this.accountService.login(this.loginForm.value).subscribe({
+      next: _ => {
+        this.router.navigateByUrl('/dashboard');
+      },
+      error: error => {
+        if (error.status === 401) {
+          // Handle unauthorized login
+          this.toastService.showToast(false, 'Invalid username or password');
+        } else if (error.error?.errors) {
+          // Handle model validation errors from backend
+          const messages = Object.values(error.error.errors).flat();
+          messages.forEach(msg => this.toastService.showToast(false, error));
+        } else {
+          // General fallback
+          this.toastService.showToast(false, 'An unexpected error occurred');
+          console.error('Login error:', error);
         }
-      })
-    }
+      }
+    });
   }
+}
+
 }
