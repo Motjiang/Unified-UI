@@ -1,27 +1,48 @@
-# UnifiedUI
+# ERP Management System - Unified
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.17.
+## Overview
 
-## Development server
+This ERP Management System is a lightweight yet comprehensive solution designed to streamline core organizational operations such as role management, ticketing, inventory control, leave management, and analytics. The system facilitates smooth collaboration between Admin, HR, Technicians, and Assistants with tailored dashboards and automated processes.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Built using modern technologies including ASP.NET Core RESTful APIs, Angular 17, JWT authentication, and hosted on Microsoft Azure, this project is aimed at providing a secure, scalable, and maintainable ERP solution for small to medium enterprises.
 
-## Code scaffolding
+## Features
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### Role-Based Access Control
+- Admin creates HR, who in turn can create other roles like Technician and Assistant with specific permissions.
 
-## Build
+### Ticketing System
+- Admin, HR, and Assistants can log support tickets for Technicians to resolve.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+### Inventory & Bookstore Management
+- Bookstore Assistant manages sales manually, updates inventory, and can request new books from Admin if stock is unavailable.
 
-## Running unit tests
+### Leave Management
+- Employees can submit leave requests; HR reviews and approves or rejects these requests.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### Employee & Department Management
+- HR can create departments and designations and assign them to employees.
 
-## Running end-to-end tests
+### Audit Trails
+- Tracks changes and important operations for accountability and monitoring.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+### Analytics Dashboards
+- Role-specific dashboards provide insights into sales, tickets, leaves, and other KPIs.
 
-## Further help
+### Authentication & Security
+- Secure login using JWT tokens with password reset via Mailjet email integration.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+### Cloud Deployment
+-Soon >> it will be hosted on Microsoft Azure using App Services, SQL Database, and Blob Storage for scalability and reliability.
+
+## Technology Stack
+
+| Layer           | Technology / Tools                         |
+|-----------------|--------------------------------------------|
+| Backend API     | ASP.NET Core 9, C#                         |
+| Frontend        | Angular 17, TypeScript, Bootstrap 5       |
+| Authentication  | JWT (JSON Web Tokens)                      |
+| Email Service   | Mailjet SMTP                              |
+| Database        | Microsoft SQL Server                       |
+| Cloud Hosting   | Microsoft Azure (App Services, SQL Database, Blob Storage) |
+| Version Control | Git & GitHub                              |
