@@ -33,7 +33,7 @@ Built using modern technologies including ASP.NET Core RESTful APIs, Angular 17,
 - Secure login using JWT tokens with password reset via Mailjet email integration.
 
 ### Cloud Deployment
--Soon >> it will be hosted on Microsoft Azure using App Services, SQL Database, and Blob Storage for scalability and reliability.
+- Soon >> it will be hosted on Microsoft Azure using App Services, SQL Database, and Blob Storage for scalability and reliability.
 
 ## Technology Stack
 
