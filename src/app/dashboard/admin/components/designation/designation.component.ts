@@ -90,17 +90,20 @@ export class DesignationComponent implements OnInit {
     this.loadDesignations();
   }
 
-  loadDesignations(): void {
- this.designationService
-  .getAllDesignations(this.currentPage, this.pageSize, this.search)
-  .subscribe(response => {
-    this.designations = response.data;
-    this.totalPages = Math.ceil(response.totalCount / this.pageSize);
-  }, error => {
-    console.error('Error fetching designations', error);
-  });
+ loadDesignations(): void {
+  this.designationService
+    .getAllDesignations(this.currentPage, this.pageSize, this.search)
+    .subscribe({
+      next: response => {
+        this.designations = response.data;
+        this.totalPages = Math.ceil(response.totalCount / this.pageSize);
+      },
+      error: error => {
+        console.error('Error fetching designations', error);
+      }
+    });
+}
 
-  }
 
   onSearch(): void {
     this.currentPage = 1;
