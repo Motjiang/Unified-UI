@@ -71,7 +71,7 @@ import { Department } from './models/department';
 export class DepartmentComponent implements OnInit {
   departments: Department[] = [];
   search: string = '';
-  pageSize = 10;
+  pageSize = 7;
   currentPage = 1;
   totalPages = 0;
 

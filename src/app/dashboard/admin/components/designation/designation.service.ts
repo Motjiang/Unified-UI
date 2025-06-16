@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../../../environments/environment.development';
 import { PagedDesignationResponse } from './models/paged-designation-response';
 import { AccountService } from '../../../../account/service/account.service';
+import { CreateDesignation } from './models/create-designation';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +24,10 @@ export class DesignationService {
       `${environment.appUrl}/api/designation/get-all-designations`,
       { params, ...this.getAuthHeaders() }
     );
+  }
+
+  addDesignation(designation:CreateDesignation) : Observable<CreateDesignation> {
+    return this.http.post<CreateDesignation>(`${environment.appUrl}/api/designation/add-designation`, designation, this.getAuthHeaders())
   }
 
   private getAuthHeaders() {
