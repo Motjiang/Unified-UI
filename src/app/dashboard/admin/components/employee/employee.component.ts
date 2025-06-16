@@ -1,122 +1,185 @@
 import { Component, OnInit } from '@angular/core';
-import { ViewEmployee } from '../../../../shared/models/viewEmployee';
-import { AdminService } from '../../service/admin.service';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';  // use Router to navigate
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';;
+import { EmployeeService } from './employee.service';
+import { PaginationComponent } from '../../../../shared/pagination/pagination.component';
+import { Employee } from './models/employee';
+import { DepartmentService } from '../department/department.service';
+import { Department } from '../department/models/department';
+import { Designation } from '../designation/models/designation';
+import { DesignationService } from '../designation/designation.service';
 
 @Component({
   selector: 'app-employee',
   standalone: true,
-  imports: [RouterLink, CommonModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   template: `
-   <div class="my-3">
-    <a class="btn btn-outline-primary" routerLink="/admin/add-edit-member">Create Member</a>
+  <div class="container">
+  <!-- Section Title -->
+  <h2 class="text-center mt-5 mb-5 display-5">List of Employees</h2>
+
+  <!-- Action Row -->
+<div class="row gy-3 align-items-center mb-4">
+  <!-- New Employee Button -->
+  <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-start">
+    <a class="btn btn-primary">
+      <i class="bi bi-plus"></i> New Employee
+    </a>
+  </div>
+
+  <!-- Filters + Search -->
+  <div class="col-12 col-md-6">
+  <form
+  class="d-flex justify-content-md-end align-items-center gap-2 flex-nowrap"
+  (ngSubmit)="onSearch()"
+  role="search"
+  novalidate
+>
+
+  <!-- Department Filter -->
+  <select
+    class="form-select"
+    [(ngModel)]="selectedDepartment"
+    name="department"
+    aria-label="Filter by department"
+style="width: auto; display: inline-block;"
+    (change)="onSearch()"
+  >
+    <option value="">All Departments</option>
+    <option *ngFor="let d of departments" [value]="d.id">{{ d.name }}</option>
+  </select>
+
+  <!-- Search Input -->
+  <input
+    class="form-control"
+    type="search"
+    [(ngModel)]="search"
+    name="search"
+    placeholder="Search by first or last name"
+    aria-label="Search employees"
+ style="width: auto; min-width: 240px; max-width: 600px; flex-grow: 2;"  />
+
+  <!-- Search Button -->
+  <button class="btn btn-outline-success d-flex align-items-center" type="submit">
+    <i class="bi bi-search me-1"></i> Search
+  </button>
+</form>
+
+  </div>
 </div>
 
-<table class="table table-striped">
+
+  <!-- Employees Table -->
+  <table class="table table-hover">
     <thead>
-        <tr class="table-warning">
-            <th>Username</th>
-            <th>First name</th>
-            <th>Last name</th>
-            <th>Date created</th>
-            <th>Roles</th>
-            <th class="text-center">Lock / Unlock</th>
-            <th class="text-center">Edit / Delete</th>
-        </tr>
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Designation</th>
+        <th>Department</th>
+        <th class="text-md-end">Actions</th>
+      </tr>
     </thead>
     <tbody>
-        <tr *ngIf="members.length === 0">
-            <td colspan="7" class="text-center">No Members</td>
-        </tr>
-
-        <tr *ngFor="let member of members">
-            <td>{{member.userName}}</td>
-            <td>{{member.firstName | titlecase}}</td>
-            <td>{{member.lastName | titlecase}}</td>
-            <td>{{member.dateCreated | date}}</td>
-            <td>
-                <span *ngFor="let role of member.roles; let i = index">
-                    {{role}}<span *ngIf="i + 1 < member.roles.length">, </span>
-                </span>
-            </td>
-            <td class="text-center">
-                <a class="btn btn-warning btn-sm me-2" *ngIf="!member.isLocked" (click)="lockMember(member.id)">
-                    Lock
-                </a>
-                <a class="btn btn-success btn-sm" *ngIf="member.isLocked" (click)="unlockMember(member.id)">
-                    Unlock
-                </a>
-            </td>
-            <td class="text-center">
-                <button class="btn btn-primary btn-sm me-2" routerLink="/admin/add-edit-member/{{member.id}}">
-                    Edit
-                </button>
-                <button class="btn btn-danger btn-sm" (click)="deleteMember()">
-                    Delete
-                </button>
-            </td>
-        </tr>
+      <tr *ngFor="let emp of employees">
+        <td>{{ emp.firstName }}</td>
+        <td>{{ emp.lastName }}</td>
+        <td>{{ emp.designationId }}</td>
+        <td>{{ emp.departmentId }}</td>
+        <td class="text-md-end" style="white-space: nowrap">
+          <button class="btn btn-sm btn-warning me-2">
+            <i class="bi bi-pencil-square"></i> Update
+          </button>
+          <button class="btn btn-sm btn-danger">
+            <i class="bi bi-trash3"></i> Delete
+          </button>
+        </td>
+      </tr>
     </tbody>
-</table>
+  </table>
 
-<ng-template #template>
-    <div class="modal-body text-center">
-        <p>Are you sure you want to delete {{memberToDelete?.userName}}?</p>
-        <button type="button" class="btn btn-default" (click)="confirm()">Yes</button>
-        <button type="button" class="btn btn-primary" (click)="decline()">No</button>
-    </div>
-</ng-template>
+  <!-- Pagination Component -->
+  <app-pagination
+  [totalPages]="totalPages"
+  [pageIndex]="currentPage"
+  [searchString]="search"
+  (pageChanged)="onPageChange($event)"
+></app-pagination>
+</div>
+
   `,
-  styleUrl: './employee.component.css'
+  styleUrls: ['./employee.component.css']
 })
 export class EmployeeComponent implements OnInit {
-  members: ViewEmployee[] = [];
-  memberToDelete: ViewEmployee | undefined;
+  employees: Employee[] = [];
 
-  constructor(private adminService: AdminService) {}
+  departments!: Department[];
+  selectedDepartment: number | '' = '';
+  search: string = '';
+
+  pageSize = 10;
+  currentPage = 1;
+  totalPages = 0;
+
+  employeeToDelete: Employee | undefined;
+
+  constructor(private employeeService: EmployeeService, private departmentService: DepartmentService, private router: Router) { }
 
   ngOnInit(): void {
-    this.adminService.getMembers().subscribe({
-      next: members => this.members = members
+    this.loadFilters();
+    this.loadEmployees();
+  }
+
+  loadFilters() {
+    this.getDepartments();
+  }
+
+  loadEmployees(): void {
+    this.employeeService
+      .getAllEmployees(
+        this.currentPage,
+        this.pageSize,
+        this.search,
+        this.selectedDepartment === '' ? undefined : this.selectedDepartment
+      )
+      .subscribe({
+        next: response => {
+          this.employees = response.data.map(emp => ({
+            ...emp,
+            dateCreated: new Date(emp.dateCreated),
+            dateOfBirth: emp.dateOfBirth ? new Date(emp.dateOfBirth) : undefined,
+            userName: emp.email,
+            isLocked: false,
+            roles: []
+          }));
+
+          this.totalPages = Math.ceil(response.totalCount / this.pageSize);
+        },
+        error: error => {
+          console.error('Error fetching employees', error);
+        }
+      });
+  }
+
+  getDepartments() {
+    this.departmentService.getAllDepartments(1, 100, '').subscribe({
+      next: response => {
+        this.departments = response.data;
+      },
+      error: error => {
+        console.error('Error fetching departments', error);
+      }
     });
   }
 
-  lockMember(id: string) {
-    this.adminService.lockMember(id).subscribe({
-      next: _ => {
-        this.handleLockUnlockFilterAndMessage(id, true);
-      }
-    })
+  onSearch() {
+    this.currentPage = 1;
+    this.loadEmployees();
   }
 
-  unlockMember(id: string) {
-    this.adminService.unlockMember(id).subscribe({
-      next: _ => {
-        this.handleLockUnlockFilterAndMessage(id, false);
-      }
-    })
-  }
-
-  deleteMember() {
-   
-  }
-
-  confirm() {
-  }
-
-  decline() {
-  }
-
-  private handleLockUnlockFilterAndMessage(id: string, locking: boolean) {
-  }
-
-  private findMember(id: string): ViewEmployee | undefined {
-    let member = this.members.find(x => x.id === id);
-    if (member) {
-      return member;
-    }
-
-    return undefined;
+  onPageChange(newPage: number) {
+    this.currentPage = newPage;
+    this.loadEmployees();
   }
 }

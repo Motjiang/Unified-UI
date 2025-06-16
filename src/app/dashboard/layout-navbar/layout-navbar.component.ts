@@ -36,7 +36,7 @@ import { UserHasRoleDirective } from '../../account/security/user-has-role.direc
             Manage Employee
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item btn btn-link cursor-pointer" [routerLink]="['/dashboard/admin/employee']">Create</a></li>
+            <li><a class="dropdown-item btn btn-link cursor-pointer" [routerLink]="['/dashboard/admin/employee']">Employees</a></li>
           </ul>
         </li>
         </ng-container>
