@@ -16,7 +16,7 @@ import { Department } from './models/department';
 
   <div class="row gy-3 align-items-center mb-5">
     <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-start">
-      <a class="btn btn-primary">
+      <a class="btn btn-primary"  [routerLink]="['/dashboard/admin/add-department']">
         <i class="bi bi-plus"></i> New Department
       </a>
     </div>
