@@ -19,7 +19,7 @@ import { FormsModule } from '@angular/forms';
   <div class="row gy-3 align-items-center mb-5">
     <!-- New Designation Button -->
     <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-start">
-      <a class="btn btn-primary">
+      <a class="btn btn-primary" [routerLink]="['/dashboard/admin/add-designation']">
         <i class="bi bi-plus"></i> New Designation
       </a>
     </div>

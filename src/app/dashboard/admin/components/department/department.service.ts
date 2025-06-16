@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { AccountService } from '../../../../account/service/account.service';
 import { PagedDepartmentResponse } from './models/paged-department-response';
 import { environment } from '../../../../../environments/environment.development';
+import { CreateDepartment } from './models/create-department';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +24,10 @@ export class DepartmentService {
       `${environment.appUrl}/api/department/get-all-departments`,
       { params, ...this.getAuthHeaders() }
     );
+  }
+
+  addDepartment(department: CreateDepartment) : Observable<CreateDepartment> {
+    return this.http.post<CreateDepartment>(`${environment.appUrl}/api/department/add-department`, department, this.getAuthHeaders());
   }
   
   private getAuthHeaders() {
